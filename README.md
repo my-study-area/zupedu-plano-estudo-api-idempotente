@@ -20,6 +20,7 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [Texto - Draft para uma RFC para Idempotency Key (30 min| en)](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/)
 - [Texto - Implemetando Idempotencia em ambientes AWS Serveless (7 min | en)](https://qasimalbaqali.medium.com/achieving-idempotency-in-the-aws-serverless-space-d0671a521479)
 - [Video - Você sabe o que é idempotência? Uma abordagem prática com Java e Kafka (1h 16min | pt_br)](https://www.youtube.com/watch?v=uSXAln1cfqU&ab_channel=DXLab)
+- [IDEMPOTÊNCIA: O que é e como implementar com Redis](https://www.youtube.com/watch?v=h1zRfNJtTYA)
 
 ## Exemplos práticos
 - [spring boot etag header example](https://javadeveloperzone.com/spring-boot/spring-boot-etag-header-example/)
