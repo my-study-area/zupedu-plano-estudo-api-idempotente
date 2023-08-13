@@ -23,4 +23,44 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [IDEMPOTÊNCIA: O que é e como implementar com Redis](https://www.youtube.com/watch?v=h1zRfNJtTYA)
 
 ## Exemplos práticos
+### Aplicação etag-header
 - [spring boot etag header example](https://javadeveloperzone.com/spring-boot/spring-boot-etag-header-example/)
+https://github.com/gregwhitaker/etag-example/blob/master/src/main/java/example/etag/service/config/ETagConfiguration.java
+
+```bash
+cd exemplos-praticos/etag-header
+curl --location 'localhost:8080/hello' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > GET /hello HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > 
+# < HTTP/1.1 200 
+# < ETag: "07d793b78c60fb2b2c265e8c3114bc321"
+# < Content-Type: text/plain;charset=UTF-8
+# < Content-Length: 17
+# < Date: Thu, 10 Aug 2023 00:47:36 GMT
+# < 
+# * Connection #0 to host localhost left intact
+# Hello etag Header
+
+curl --header 'If-None-Match: "07d793b78c60fb2b2c265e8c3114bc321"' --location 'http://localhost:8080/hello' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > GET /hello HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > If-None-Match: "07d793b78c60fb2b2c265e8c3114bc321"
+# > 
+# < HTTP/1.1 304 
+# < ETag: "07d793b78c60fb2b2c265e8c3114bc321"
+# < Date: Thu, 10 Aug 2023 00:47:46 GMT
+# < 
+# * Connection #0 to host localhost left intact
+```
+> Obs: o teste também pode ser realizado utilizando um browser com Developer tools habilitado, na aba Network, para visualizar as informações do header da requisição.
