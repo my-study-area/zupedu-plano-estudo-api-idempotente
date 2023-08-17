@@ -38,4 +38,8 @@ public class Autor {
     public Long getId() {
         return id;
     }
+
+    public String getEmail() {
+        return email;
+    }
 }
