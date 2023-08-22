@@ -21,9 +21,9 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [Texto - Implemetando Idempotencia em ambientes AWS Serveless (7 min | en)](https://qasimalbaqali.medium.com/achieving-idempotency-in-the-aws-serverless-space-d0671a521479)
 - [Video - Você sabe o que é idempotência? Uma abordagem prática com Java e Kafka (1h 16min | pt_br)](https://www.youtube.com/watch?v=uSXAln1cfqU&ab_channel=DXLab)
 - [IDEMPOTÊNCIA: O que é e como implementar com Redis](https://www.youtube.com/watch?v=h1zRfNJtTYA)
-
+- [[Arquitetura] Resolvendo Race Condition com Distributed Lock](https://www.youtube.com/watch?v=9yB7DYq1PNs)
 ## Exemplos práticos
-### Aplicação etag-header
+### Aplicação utilizando primary key com etag e If-None-Match
 - [spring boot etag header example](https://javadeveloperzone.com/spring-boot/spring-boot-etag-header-example/)
 https://github.com/gregwhitaker/etag-example/blob/master/src/main/java/example/etag/service/config/ETagConfiguration.java
 
@@ -64,3 +64,155 @@ curl --header 'If-None-Match: "07d793b78c60fb2b2c265e8c3114bc321"' --location 'h
 # * Connection #0 to host localhost left intact
 ```
 > Obs: o teste também pode ser realizado utilizando um browser com Developer tools habilitado, na aba Network, para visualizar as informações do header da requisição.
+
+### Aplicação utilizando primary key, Secondary-Key e Idempotency-Key
+
+```bash
+# entra no diretório
+cd exemplos-praticos/nossa-biblioteca/
+
+# inicia o redis
+docker-compose up -d
+```
+
+Requisição com primary-key utilizando If-Match:
+```bash
+curl --location 'localhost:8080/api/payments1' \
+--header 'If-Match: b79b29bf-5e3a-4e69-a39d-7cd523409cf9' \
+--header 'Content-Type: application/json' \
+--data '{
+    "paymentAmount": "100.00",
+    "transactionId": "b79b29bf-5e3a-4e69-a39d-7cd523409cf9",
+    "currency": "BRL"
+}' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > POST /api/payments1 HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > If-Match: b79b29bf-5e3a-4e69-a39d-7cd523409cf9
+# > Content-Type: application/json
+# > Content-Length: 117
+# > 
+# * upload completely sent off: 117 out of 117 bytes
+# < HTTP/1.1 201 
+# < Location: http://localhost:8080/api/payments1/1
+# < Content-Length: 0
+# < Date: Tue, 22 Aug 2023 01:03:11 GMT
+# < 
+# * Connection #0 to host localhost left intact
+
+curl --location 'localhost:8080/api/payments1' \
+--header 'If-Match: b79b29bf-5e3a-4e69-a39d-7cd523409cf9' \
+--header 'Content-Type: application/json' \
+--data '{
+    "paymentAmount": "100.00",
+    "transactionId": "b79b29bf-5e3a-4e69-a39d-7cd523409cf9",
+    "currency": "BRL"
+}' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > POST /api/payments1 HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > If-Match: b79b29bf-5e3a-4e69-a39d-7cd523409cf9
+# > Content-Type: application/json
+# > Content-Length: 117
+# > 
+# * upload completely sent off: 117 out of 117 bytes
+# < HTTP/1.1 412 
+# < Content-Type: application/json
+# < Transfer-Encoding: chunked
+# < Date: Tue, 22 Aug 2023 01:04:20 GMT
+# < 
+# * Connection #0 to host localhost left intact
+# {"timestamp":"2023-08-22T01:04:20.828+00:00","status":412,"error":"Precondition Failed","path":"/api/payments1"}
+```
+
+Realizando uma requisição utilizando um método com Secondary-Key
+```bash
+curl --location 'localhost:8080/api/payments2' \
+--header 'Content-Type: application/json' \
+--data '{
+    "paymentAmount": "100.00",
+    "transactionId": "63673167-0b3c-41c6-9642-6cae67ce5303",
+    "currency": "BRL"
+}' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > POST /api/payments2 HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > Content-Type: application/json
+# > Content-Length: 117
+# > 
+# * upload completely sent off: 117 out of 117 bytes
+# < HTTP/1.1 201 
+# < Location: http://localhost:8080/api/payments2/4
+# < Content-Length: 0
+# < Date: Tue, 22 Aug 2023 01:09:32 GMT
+# < 
+# * Connection #0 to host localhost left intact
+
+curl --location 'localhost:8080/api/payments2' \
+--header 'Content-Type: application/json' \
+--data '{
+    "paymentAmount": "100.00",
+    "transactionId": "63673167-0b3c-41c6-9642-6cae67ce5303",
+    "currency": "BRL"
+}' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > POST /api/payments2 HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > Content-Type: application/json
+# > Content-Length: 117
+# > 
+# * upload completely sent off: 117 out of 117 bytes
+# < HTTP/1.1 409 
+# < Content-Type: application/json
+# < Transfer-Encoding: chunked
+# < Date: Tue, 22 Aug 2023 01:06:45 GMT
+# < 
+# * Connection #0 to host localhost left intact
+# {"timestamp":"2023-08-22T01:06:45.889+00:00","status":409,"error":"Conflict","path":"/api/payments2"}
+```
+
+Realizando uma requisição utilizando Idempotency-Key
+```bash
+curl --location 'localhost:8080/api/payments3' \
+--header 'Idempotency-Key: 6d683b56-a6bf-4fcd-89d7-9d5e1c7848d6' \
+--header 'Content-Type: application/json' \
+--data '{
+    "paymentAmount": "100.00",
+    "transactionId": "6d683b56-a6bf-4fcd-89d7-9d5e1c7848d6",
+    "currency": "BRL"
+}' -v
+# *   Trying 127.0.0.1...
+# * TCP_NODELAY set
+# * Connected to localhost (127.0.0.1) port 8080 (#0)
+# > POST /api/payments3 HTTP/1.1
+# > Host: localhost:8080
+# > User-Agent: curl/7.58.0
+# > Accept: */*
+# > Idempotency-Key: 6d683b56-a6bf-4fcd-89d7-9d5e1c7848d6
+# > Content-Type: application/json
+# > Content-Length: 117
+# > 
+# * upload completely sent off: 117 out of 117 bytes
+# < HTTP/1.1 201 
+# < Location: http://localhost:8080/api/payments3/5
+# < Content-Length: 0
+# < Date: Tue, 22 Aug 2023 01:14:05 GMT
+# < 
+# * Connection #0 to host localhost left intact
+```
