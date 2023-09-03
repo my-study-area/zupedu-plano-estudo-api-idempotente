@@ -21,7 +21,7 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [Texto - Implemetando Idempotencia em ambientes AWS Serveless (7 min | en)](https://qasimalbaqali.medium.com/achieving-idempotency-in-the-aws-serverless-space-d0671a521479)
 - [Video - Você sabe o que é idempotência? Uma abordagem prática com Java e Kafka (1h 16min | pt_br)](https://www.youtube.com/watch?v=uSXAln1cfqU&ab_channel=DXLab)
 - [IDEMPOTÊNCIA: O que é e como implementar com Redis](https://www.youtube.com/watch?v=h1zRfNJtTYA)
-- [Arquitetura] Resolvendo Race Condition com Distributed Lock](https://www.youtube.com/watch?v=9yB7DYq1PNs)
+- [Arquitetura - Resolvendo Race Condition com Distributed Lock](https://www.youtube.com/watch?v=9yB7DYq1PNs)
 - [Escrevendo Clients e Services Tolerantes a Falhas com Rafael Ponte | 💻 Zup Open Talks 🚀](https://www.youtube.com/watch?v=TMmN9cR_IsM&ab_channel=Zup)
 ## Exemplos práticos
 ### Aplicação utilizando primary key com etag e If-None-Match
