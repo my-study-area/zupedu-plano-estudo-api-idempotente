@@ -218,3 +218,27 @@ curl --location 'localhost:8080/api/payments3' \
 # < 
 # * Connection #0 to host localhost left intact
 ```
+
+## Resumo sobre idempotência
+
+Idempotência é uma propriedade comum da matemática que encontramos na potenciação com expoente “0” (zero) e em algumas outras operações que, independente da quantidade de vezes que são executadas, sempre retornam o mesmo valor. Por exemplo, 2 ^ 0 (Lê-se dois elevado a zero) sempre terá como resultado 1. Outro exemplo é a multiplicação de um número por zero, veja alguns exemplos abaixo:
+2 x 0 = 0
+92 x 0 = 0
+2546 x 0 = 0
+
+Como exemplificado acima, podemos comprovar que a multiplicação por zero é  operação idempotente. Não importa quantas vezes sejam executadas as operações acima, sempre terão o mesmo resultado, o resultado final zero.
+
+O mesmo se aplica na ciência da computação através das requisições HTTP, onde, por padrão, temos alguns métodos idempotentes e outros não, mas podemos modificar esse comportamento através de algumas técnicas que serão abordadas adiante. Para entendermos um pouco melhor, é interessante conhecermos duas propriedades dos métodos HTTP: safe e idempotency. 
+
+Um método safe é aquele que não altera o estado do servidor, como por exemplo, os métodos de leitura como  GET, HEAD, OPTIONS, and TRACE. Já um método idempotente é aquele que pode ser executado mais de uma vez e mesmo assim retorna o mesmo resultado como se fosse uma única requisição, como no caso do PUT, DELETE e os métodos safe. Vale lembrar que todos os métodos HTTP que possuem a propriedade safe são, também, idempotentes.
+
+Agora vamos falar dos métodos PUT e DELETE que acabam gerando algumas dúvidas em relação a idempotência. Isso ocorre, em algumas situações, quando imaginamos um cenário de deleção de um recurso que na primeira requisição, onde o recurso deixa de existir e ao realizar uma segunda requisição não encontra o recurso, e dependendo da forma que foi desenvolvido, pode retornar um status code 404 (NOT FOUND). Por mais estranho que isto pareça, está correto,  o método não deixa de ser idempotente quando a primeira e segunda requisições tem status code diferente. O que torna um método idempotente é quando uma ou mais requisições causam o  mesmo efeito no servidor, no caso, é não existir o recurso independente do status code retornado. Algo similar ocorre no  método PUT onde diversas requisições com os mesmos dados de entrada sempre causam o mesmo efeito.
+
+Então, se eu precisar utilizar idempotência nos métodos PATCH e POST, é possível? A resposta é SIM, através da utilização de conditional key, secondary key e idempotency key. Com essas estratégias é possível realizar uma ou diversas requisições, com os mesmo dados de entrada, sem causar um efeito colateral no servidor.
+
+Através da conditional key temos duas formas de aplicar a estratégia: etag + if-none-match e if-match. Na primeira estratégia o servidor deve enviar o campo etag na resposta de uma requisição e o cliente deve armazená-la para enviar em sua request passando o valor da etag no header da requisição, no campo if-none-match, e em caso de sucesso pode responder com um status code 200, caso contrário responde com um 412 Precondition Failed. Na segunda estratégia, por exemplo, em uma requisição POST, enviamos uma requisição com o com o campo  if-match no header e utilizamos essa informação para retornar um 412 Precondition Failed caso o campo seja um identificador do recurso.
+
+A estratégia de uso de uma secondary key é bem comum, utilizamos alguma informação da request com o identificador do recurso e caso de encontrarmos um recurso numa requisição POST podemos responder com um status code 409 Conflito.
+
+No caso da estratégia utilizando um idempotency key utilizamos o campo Idempontecy-Key, no header da requisição, para identificarmos se o recurso já existe ao realizarmos uma requisição POST. Assim podemos utilizar um banco de dados em memória para armazenar as respostas e retornar ao usuário a resposta da primeira requisição, podendo ser uma resposta de sucesso ou até mesmo uma resposta de erro.
+
