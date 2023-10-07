@@ -24,6 +24,8 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [Arquitetura - Resolvendo Race Condition com Distributed Lock](https://www.youtube.com/watch?v=9yB7DYq1PNs)
 - [Escrevendo Clients e Services Tolerantes a Falhas com Rafael Ponte | 💻 Zup Open Talks 🚀](https://www.youtube.com/watch?v=TMmN9cR_IsM&ab_channel=Zup)
 - [HTTP conditional requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests)
+- [Artigo original sobre REST](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm)
+
 ## Exemplos práticos
 ### Aplicação utilizando primary key com etag e If-None-Match
 - [spring boot etag header example](https://javadeveloperzone.com/spring-boot/spring-boot-etag-header-example/)
