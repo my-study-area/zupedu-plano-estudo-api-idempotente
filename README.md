@@ -25,6 +25,7 @@ Plano de estudo - Desenhando REST APIs Idempotentes e Tolerantes a falhas
 - [Escrevendo Clients e Services Tolerantes a Falhas com Rafael Ponte | 💻 Zup Open Talks 🚀](https://www.youtube.com/watch?v=TMmN9cR_IsM&ab_channel=Zup)
 - [HTTP conditional requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests)
 - [Artigo original sobre REST](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm)
+- [Desenhando e implementando APIs robustas e previsíveis com fail fast e idempotencia](https://www.youtube.com/watch?v=_MYy68tKsbA&list=PLHMMERsvy9EyWQPru4SrJAYHEGKfkjRgP&t=8954s)
 
 ## Exemplos práticos
 ### Aplicação utilizando primary key com etag e If-None-Match
